@@ -124,10 +124,11 @@ export const AuthLoginCommand = cmd({
           opencode: 0,
           anthropic: 1,
           "github-copilot": 2,
-          openai: 3,
-          google: 4,
-          openrouter: 5,
-          vercel: 6,
+          qwen: 3,
+          openai: 4,
+          google: 5,
+          openrouter: 6,
+          vercel: 7,
         }
         let provider = await prompts.autocomplete({
           message: "Select provider",
@@ -154,6 +155,24 @@ export const AuthLoginCommand = cmd({
         })
 
         if (prompts.isCancel(provider)) throw new UI.CancelledError()
+
+
+        if (provider === "qwen") {
+          const { AuthQwen } = await import("../../auth/qwen")
+          const hasExistingAuth = await AuthQwen.access()
+          if (hasExistingAuth) {
+            prompts.log.success("Already authenticated with Qwen via OAuth")
+            prompts.log.info("Token found in ~/.qwen/oauth_creds.json")
+            prompts.outro("Done")
+            return
+          }
+
+          prompts.log.info("Qwen authentication options:")
+          prompts.log.info("1. Run 'qwen auth login' in your terminal to authenticate via OAuth")
+          prompts.log.info("2. Set the DASHSCOPE_API_KEY environment variable to use DashScope API")
+          prompts.outro("Done")
+          return
+        }
 
         const plugin = await Plugin.list().then((x) => x.find((x) => x.auth?.provider === provider))
         if (plugin && plugin.auth) {

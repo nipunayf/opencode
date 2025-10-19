@@ -66,9 +66,24 @@ export namespace ModelsDev {
     refresh()
     const file = Bun.file(filepath)
     const result = await file.json().catch(() => {})
-    if (result) return result as Record<string, Provider>
-    const json = await data()
-    return JSON.parse(json) as Record<string, Provider>
+    let database: Record<string, Provider>
+    if (result) {
+      database = result as Record<string, Provider>
+    } else {
+      const json = await data()
+      database = JSON.parse(json) as Record<string, Provider>
+    }
+
+    // Add qwen provider by copying alibaba if qwen not present
+    if (!database["qwen"] && database["alibaba"]) {
+      database["qwen"] = {
+        ...database["alibaba"],
+        id: "qwen",
+        name: "Qwen Coder",
+      }
+    }
+
+    return database
   }
 
   export async function refresh() {

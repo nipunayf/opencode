@@ -82,6 +82,33 @@ export namespace Provider {
         options: hasKey ? {} : { apiKey: "public" },
       }
     },
+    async qwen() {
+      const token = await (async () => {
+        const { AuthQwen } = await import("../auth/qwen")
+        return AuthQwen.access()
+      })()
+      if (token) {
+        return {
+          autoload: true,
+          options: {
+            apiKey: token,
+            baseURL: "https://portal.qwen.ai/v1",
+          },
+        }
+      }
+
+      const apiKey = process.env["DASHSCOPE_API_KEY"]
+      if (apiKey) {
+        return {
+          autoload: true,
+          options: {
+            apiKey,
+          },
+        }
+      }
+
+      return { autoload: false }
+    },
     openai: async () => {
       return {
         autoload: false,

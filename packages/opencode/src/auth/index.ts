@@ -62,3 +62,4 @@ export namespace Auth {
     await fs.chmod(file.name!, 0o600)
   }
 }
+export { AuthQwen } from "./qwen"
