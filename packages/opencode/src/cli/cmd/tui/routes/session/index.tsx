@@ -443,7 +443,12 @@ export function Session() {
       keybind: "messages_toggle_conceal" as any,
       category: "Session",
       onSelect: (dialog) => {
-        setConceal((prev) => !prev)
+        const newState = !conceal()
+        setConceal(newState)
+        toast.show({
+          message: `Conceal mode ${newState ? "enabled" : "disabled"}`,
+          variant: "success",
+        })
         dialog.clear()
       },
     },
