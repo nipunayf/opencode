@@ -864,6 +864,19 @@ export namespace LSPServer {
     root: NearestRoot(["pom.xml", "build.gradle", "build.gradle.kts", ".project", ".classpath"]),
     extensions: [".java"],
     async spawn(root) {
+      // Check if jdtls command is available in PATH first (e.g., from Homebrew)
+      const jdtlsCommand = Bun.which("jdtls")
+      if (jdtlsCommand) {
+        log.info("Using jdtls from PATH", { path: jdtlsCommand })
+        const dataDir = await fs.mkdtemp(path.join(os.tmpdir(), "opencode-jdtls-data"))
+        return {
+          process: spawn(jdtlsCommand, ["-data", dataDir], {
+            cwd: root,
+          }),
+        }
+      }
+
+      // Fall back to bundled/downloaded jdtls
       const java = Bun.which("java")
       if (!java) {
         log.error("Java 21 or newer is required to run the JDTLS. Please install it first.")
