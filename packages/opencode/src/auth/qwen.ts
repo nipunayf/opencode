@@ -2,7 +2,7 @@ import os from "os"
 import path from "path"
 import { Auth } from "./index"
 import z from "zod/v4"
-import { NamedError } from "../util/error"
+import { NamedError } from "@opencode-ai/util/error"
 
 /**
  * Qwen OAuth Authentication Module
